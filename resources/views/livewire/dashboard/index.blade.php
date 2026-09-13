@@ -163,7 +163,7 @@
         </div>
     </flux:card>
 
-    <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <flux:card size="sm">
             <flux:heading size="lg">{{ __('Accounts') }}</flux:heading>
 
