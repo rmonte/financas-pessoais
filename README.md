@@ -2,6 +2,8 @@
 
 [![tests](https://github.com/rmonte/financas-pessoais/actions/workflows/tests.yml/badge.svg)](https://github.com/rmonte/financas-pessoais/actions/workflows/tests.yml)
 
+![Painel do Finanças Pessoais](.github/assets/dashboard.jpg)
+
 Aplicativo de finanças pessoais construído com Laravel e Livewire: contas multi-moeda, transações, faturas de cartão de crédito com parcelamento, transações recorrentes e um módulo de investimentos (ações, Tesouro Direto, previdência e renda fixa).
 
 ## Recursos
