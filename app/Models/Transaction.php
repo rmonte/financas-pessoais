@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
  * @property int|null $investment_operation_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Category|null $category
  */
 class Transaction extends Model
 {
@@ -52,36 +53,57 @@ class Transaction extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsTo<Account, $this>
+     */
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }
 
+    /**
+     * @return BelongsTo<Account, $this>
+     */
     public function toAccount(): BelongsTo
     {
         return $this->belongsTo(Account::class, 'to_account_id');
     }
 
+    /**
+     * @return BelongsTo<Category, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * @return BelongsTo<Invoice, $this>
+     */
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
     }
 
+    /**
+     * @return BelongsTo<RecurringTransaction, $this>
+     */
     public function recurringTransaction(): BelongsTo
     {
         return $this->belongsTo(RecurringTransaction::class);
     }
 
+    /**
+     * @return BelongsTo<InvestmentOperation, $this>
+     */
     public function investmentOperation(): BelongsTo
     {
         return $this->belongsTo(InvestmentOperation::class);

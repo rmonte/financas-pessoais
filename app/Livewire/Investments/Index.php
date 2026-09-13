@@ -14,6 +14,7 @@ use App\Models\InvestmentOperation;
 use App\Services\ExchangeRateService;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,17 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Investment> $investments
+ * @property-read Collection<int, Investment> $filteredInvestments
+ * @property-read Collection<int, Bank> $banks
+ * @property-read Collection<int, Account> $accounts
+ * @property-read float $exchangeRate
+ * @property-read string $totalValueInBrl
+ * @property-read array<int, array{id: string, label: string, value: float, color: string}> $allocationByAssetClass
+ * @property-read InvestmentType|null $operationInvestmentType
+ * @property-read array<int, InvestmentOperationType> $operationTypeOptions
+ */
 #[Title('Investimentos')]
 class Index extends Component
 {
@@ -64,6 +76,9 @@ class Index extends Component
         $this->authorize('viewAny', Investment::class);
     }
 
+    /**
+     * @return Collection<int, Investment>
+     */
     #[Computed]
     public function investments(): Collection
     {
@@ -72,6 +87,8 @@ class Index extends Component
 
     /**
      * The investments to list in the table, filtered by the active/closed tab.
+     *
+     * @return Collection<int, Investment>
      */
     #[Computed]
     public function filteredInvestments(): Collection
@@ -81,12 +98,18 @@ class Index extends Component
             ->values();
     }
 
+    /**
+     * @return Collection<int, Bank>
+     */
     #[Computed]
     public function banks(): Collection
     {
         return Auth::user()->banks()->orderBy('name')->get();
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
@@ -417,7 +440,7 @@ class Index extends Component
         return $rules;
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.investments.index');
     }

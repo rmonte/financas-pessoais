@@ -55,21 +55,33 @@ class Account extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsTo<Bank, $this>
+     */
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
     }
 
+    /**
+     * @return HasMany<Transaction, $this>
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * @return HasMany<Transaction, $this>
+     */
     public function incomingTransfers(): HasMany
     {
         return $this->hasMany(Transaction::class, 'to_account_id')->where('type', TransactionType::Transfer);
@@ -79,6 +91,8 @@ class Account extends Model
      * The transactions to compute the balance from: the eager-loaded collection when the
      * caller preloaded it (e.g. a listing page avoiding N+1 across many accounts), or a
      * fresh query otherwise — always correct even right after a new transaction was created.
+     *
+     * @return Collection<int, Transaction>
      */
     private function transactionsForCalculation(): Collection
     {
@@ -88,6 +102,9 @@ class Account extends Model
         return $transactions;
     }
 
+    /**
+     * @return Collection<int, Transaction>
+     */
     private function incomingTransfersForCalculation(): Collection
     {
         return $this->relationLoaded('incomingTransfers') ? $this->incomingTransfers : $this->incomingTransfers()->get();

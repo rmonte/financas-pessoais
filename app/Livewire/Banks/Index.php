@@ -6,6 +6,7 @@ use App\Concerns\ConfirmsDeletion;
 use App\Models\Bank;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,9 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Bank> $banks
+ */
 #[Title('Bancos')]
 class Index extends Component
 {
@@ -30,6 +34,9 @@ class Index extends Component
         $this->authorize('viewAny', Bank::class);
     }
 
+    /**
+     * @return Collection<int, Bank>
+     */
     #[Computed]
     public function banks(): Collection
     {
@@ -127,7 +134,7 @@ class Index extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.banks.index');
     }

@@ -46,16 +46,25 @@ class Investment extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsTo<Bank, $this>
+     */
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
     }
 
+    /**
+     * @return HasMany<InvestmentOperation, $this>
+     */
     public function operations(): HasMany
     {
         return $this->hasMany(InvestmentOperation::class);
@@ -65,6 +74,8 @@ class Investment extends Model
      * The operations to compute derived values from: the eager-loaded collection when the
      * caller preloaded it (e.g. a listing page avoiding N+1 across many investments), or a
      * fresh query otherwise — always correct even right after a new operation was created.
+     *
+     * @return Collection<int, InvestmentOperation>
      */
     private function operationsForCalculation(): Collection
     {

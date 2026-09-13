@@ -33,7 +33,7 @@ trait ConfirmsDeletion
     {
         $this->authorize('delete', $model);
 
-        $this->deletingId = $model->id;
+        $this->deletingId = (int) $model->getKey();
 
         Flux::modal($this->deletionModalName())->show();
     }

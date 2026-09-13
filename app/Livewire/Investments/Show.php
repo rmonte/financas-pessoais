@@ -9,6 +9,7 @@ use App\Models\InvestmentOperation;
 use App\Services\ExchangeRateService;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, InvestmentOperation> $operations
+ * @property-read array<int, InvestmentOperationType> $operationTypes
+ * @property-read Collection<int, Account> $accounts
+ * @property-read float $exchangeRate
+ */
 #[Title('Investimento')]
 class Show extends Component
 {
@@ -48,6 +55,9 @@ class Show extends Component
         $this->date = now()->toDateString();
     }
 
+    /**
+     * @return Collection<int, InvestmentOperation>
+     */
     #[Computed]
     public function operations(): Collection
     {
@@ -63,6 +73,9 @@ class Show extends Component
         return $this->investment->type->operationTypes();
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
@@ -206,7 +219,7 @@ class Show extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.investments.show');
     }

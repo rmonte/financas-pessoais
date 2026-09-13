@@ -9,6 +9,7 @@ use App\Models\Bank;
 use App\Services\ExchangeRateService;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,13 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Account> $accounts
+ * @property-read Collection<int, Bank> $banks
+ * @property-read float $exchangeRate
+ * @property-read string $totalBalanceInBrl
+ * @property-read int $activeAccountsCount
+ */
 #[Title('Contas')]
 class Index extends Component
 {
@@ -53,12 +61,18 @@ class Index extends Component
         $this->authorize('viewAny', Account::class);
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
         return Auth::user()->accounts()->with(['bank', 'transactions.investmentOperation', 'incomingTransfers'])->orderBy('name')->get();
     }
 
+    /**
+     * @return Collection<int, Bank>
+     */
     #[Computed]
     public function banks(): Collection
     {
@@ -255,7 +269,7 @@ class Index extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.accounts.index');
     }

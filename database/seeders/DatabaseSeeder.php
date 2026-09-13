@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::firstOrCreate(
-            ['email' => env('SEED_ADMIN_EMAIL', 'admin@example.com')],
+            ['email' => (string) config('seed.admin_email')],
             [
                 'name' => 'Admin',
-                'password' => bcrypt(env('SEED_ADMIN_PASSWORD', 'password')),
+                'password' => bcrypt((string) config('seed.admin_password')),
             ]
         );
 

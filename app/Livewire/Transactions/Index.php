@@ -9,8 +9,8 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +19,16 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Transaction> $transactions
+ * @property-read array<string, string> $totals
+ * @property-read array<int, TransactionType> $manualTransactionTypes
+ * @property-read Collection<int, Account> $accounts
+ * @property-read array<int, int> $years
+ * @property-read array<int, string> $months
+ * @property-read Collection<int, Category> $allCategories
+ * @property-read Collection<int, Category> $categories
+ */
 #[Title('Transações')]
 class Index extends Component
 {
@@ -77,6 +87,9 @@ class Index extends Component
         }
     }
 
+    /**
+     * @return Collection<int, Transaction>
+     */
     #[Computed]
     public function transactions(): Collection
     {
@@ -124,6 +137,9 @@ class Index extends Component
         return TransactionType::manuallyCreatable();
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
@@ -152,12 +168,18 @@ class Index extends Component
             ->all();
     }
 
+    /**
+     * @return Collection<int, Category>
+     */
     #[Computed]
     public function allCategories(): Collection
     {
         return Auth::user()->categories()->orderBy('name')->get();
     }
 
+    /**
+     * @return Collection<int, Category>
+     */
     #[Computed]
     public function categories(): Collection
     {
@@ -223,7 +245,11 @@ class Index extends Component
         if (! $transaction && $validated['type'] === TransactionType::Expense->value && $this->installments > 1) {
             Transaction::createInstallments(
                 $user,
-                Arr::only($validated, ['account_id', 'category_id', 'description']),
+                [
+                    'account_id' => (int) $validated['account_id'],
+                    'category_id' => $validated['category_id'] !== null ? (int) $validated['category_id'] : null,
+                    'description' => $validated['description'],
+                ],
                 (float) $validated['amount'],
                 Carbon::parse($validated['date']),
                 $this->installments,
@@ -231,7 +257,7 @@ class Index extends Component
             Flux::toast(variant: 'success', text: __('Installments created.'));
         } else {
             $validated['invoice_id'] = Transaction::resolveInvoiceId(
-                Account::find($validated['account_id']),
+                Account::find((int) $validated['account_id']),
                 TransactionType::from($validated['type']),
                 Carbon::parse($validated['date']),
             );
@@ -311,7 +337,7 @@ class Index extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.transactions.index');
     }

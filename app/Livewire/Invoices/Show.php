@@ -5,7 +5,9 @@ namespace App\Livewire\Invoices;
 use App\Enums\TransactionType;
 use App\Models\Account;
 use App\Models\Invoice;
+use App\Models\Transaction;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -13,6 +15,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Transaction> $transactions
+ * @property-read Collection<int, Account> $paymentAccounts
+ */
 #[Title('Fatura')]
 class Show extends Component
 {
@@ -27,12 +33,18 @@ class Show extends Component
         $this->invoice = $invoice;
     }
 
+    /**
+     * @return Collection<int, Transaction>
+     */
     #[Computed]
     public function transactions(): Collection
     {
         return $this->invoice->transactions()->with('category')->orderByDesc('date')->get();
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function paymentAccounts(): Collection
     {
@@ -75,7 +87,7 @@ class Show extends Component
         Flux::toast(variant: 'success', text: __('Invoice marked as paid.'));
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.invoices.show');
     }

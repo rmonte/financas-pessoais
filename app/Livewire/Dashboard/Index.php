@@ -8,10 +8,12 @@ use App\Enums\TransactionType;
 use App\Models\Account;
 use App\Models\Investment;
 use App\Models\InvestmentOperation;
+use App\Models\Invoice;
 use App\Models\RecurringTransaction;
 use App\Models\Transaction;
 use App\Services\ExchangeRateService;
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +21,21 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, Account> $accounts
+ * @property-read string $totalBalance
+ * @property-read string $accountsTotalValue
+ * @property-read Collection<int, Investment> $investments
+ * @property-read float $exchangeRate
+ * @property-read string $investmentsTotalValue
+ * @property-read array<string, string> $monthSummary
+ * @property-read Collection<int, CarbonInterface> $evolutionYears
+ * @property-read array<int, array{year: string, balance: float}> $patrimonyEvolution
+ * @property-read array<int, array{month: string, income: float, expense: float}> $incomeExpenseByMonth
+ * @property-read array<int, array{id: string, label: string, value: float, color: string}> $expenseByCategory
+ * @property-read Collection<int, Invoice> $upcomingInvoices
+ * @property-read Collection<int, RecurringTransaction> $upcomingRecurringTransactions
+ */
 #[Title('Painel')]
 class Index extends Component
 {
@@ -37,6 +54,9 @@ class Index extends Component
         RecurringTransaction::generateDueForUser(Auth::user());
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
@@ -63,6 +83,9 @@ class Index extends Component
         );
     }
 
+    /**
+     * @return Collection<int, Investment>
+     */
     #[Computed]
     public function investments(): Collection
     {
@@ -123,13 +146,16 @@ class Index extends Component
     {
         $currentYear = now()->year;
 
-        return collect(range(5, 0))->map(function (int $i) use ($currentYear) {
+        /** @var Collection<int, CarbonInterface> $years */
+        $years = collect(range(5, 0))->map(function (int $i) use ($currentYear): CarbonInterface {
             $year = $currentYear - $i;
 
             return $year === $currentYear
                 ? now()->startOfMonth()
                 : Carbon::create($year, 12, 1)->startOfMonth();
         });
+
+        return $years;
     }
 
     /**
@@ -190,8 +216,7 @@ class Index extends Component
                     $delta = match ($transaction->type) {
                         TransactionType::Income => $amount,
                         TransactionType::Expense, TransactionType::Transfer => -$amount,
-                        TransactionType::Investment => $transaction->investmentOperation->type->isOutgoing() ? -$amount : $amount,
-                        default => 0.0,
+                        default => $transaction->investmentOperation->type->isOutgoing() ? -$amount : $amount,
                     };
 
                     if (($accountCurrencies[$transaction->account_id] ?? Currency::BRL) === Currency::USD) {
@@ -327,8 +352,8 @@ class Index extends Component
             ->values()
             ->map(fn (Transaction $row, int $index) => [
                 'id' => (string) ($row->category_id ?? 'uncategorized'),
-                'label' => $row->category?->name ?? __('Uncategorized'),
-                'value' => (float) $row->total,
+                'label' => $row->category !== null ? $row->category->name : __('Uncategorized'),
+                'value' => (float) $row->getAttribute('total'),
                 'color' => self::CATEGORY_PALETTE[$index % count(self::CATEGORY_PALETTE)],
             ])
             ->all();
@@ -336,6 +361,8 @@ class Index extends Component
 
     /**
      * The next open invoices due, soonest first.
+     *
+     * @return Collection<int, Invoice>
      */
     #[Computed]
     public function upcomingInvoices(): Collection
@@ -350,6 +377,8 @@ class Index extends Component
 
     /**
      * The active recurring transactions, ordered by their next occurrence date.
+     *
+     * @return Collection<int, RecurringTransaction>
      */
     #[Computed]
     public function upcomingRecurringTransactions(): Collection
@@ -372,7 +401,7 @@ class Index extends Component
             ->values();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.dashboard.index');
     }

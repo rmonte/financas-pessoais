@@ -21,7 +21,7 @@ class DemoDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstWhere('email', env('SEED_ADMIN_EMAIL', 'admin@example.com'));
+        $user = User::firstWhere('email', (string) config('seed.admin_email'));
 
         if (! $user) {
             return;

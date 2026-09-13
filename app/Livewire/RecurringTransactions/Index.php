@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\RecurringTransaction;
 use Flux\Flux;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,11 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * @property-read Collection<int, RecurringTransaction> $recurringTransactions
+ * @property-read Collection<int, Account> $accounts
+ * @property-read Collection<int, Category> $categories
+ */
 #[Title('Transações Recorrentes')]
 class Index extends Component
 {
@@ -56,6 +62,9 @@ class Index extends Component
         }
     }
 
+    /**
+     * @return Collection<int, RecurringTransaction>
+     */
     #[Computed]
     public function recurringTransactions(): Collection
     {
@@ -65,12 +74,18 @@ class Index extends Component
             ->get();
     }
 
+    /**
+     * @return Collection<int, Account>
+     */
     #[Computed]
     public function accounts(): Collection
     {
         return Auth::user()->accounts()->orderBy('name')->get();
     }
 
+    /**
+     * @return Collection<int, Category>
+     */
     #[Computed]
     public function categories(): Collection
     {
@@ -209,7 +224,7 @@ class Index extends Component
         ];
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.recurring-transactions.index');
     }

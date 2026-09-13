@@ -49,41 +49,65 @@ class User extends Authenticatable implements PasskeyUser
         ];
     }
 
+    /**
+     * @return HasMany<Bank, $this>
+     */
     public function banks(): HasMany
     {
         return $this->hasMany(Bank::class);
     }
 
+    /**
+     * @return HasMany<Account, $this>
+     */
     public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
     }
 
+    /**
+     * @return HasMany<Category, $this>
+     */
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
     }
 
+    /**
+     * @return HasMany<Transaction, $this>
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * @return HasMany<Invoice, $this>
+     */
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
+    /**
+     * @return HasMany<RecurringTransaction, $this>
+     */
     public function recurringTransactions(): HasMany
     {
         return $this->hasMany(RecurringTransaction::class);
     }
 
+    /**
+     * @return HasMany<Investment, $this>
+     */
     public function investments(): HasMany
     {
         return $this->hasMany(Investment::class);
     }
 
+    /**
+     * @return HasMany<InvestmentOperation, $this>
+     */
     public function investmentOperations(): HasMany
     {
         return $this->hasMany(InvestmentOperation::class);
